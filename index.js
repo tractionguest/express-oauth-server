@@ -130,7 +130,7 @@ class ExpressOAuthServer {
       res.set(oauthResponse.headers);
     }
 
-    res.status(error.code);
+    res.status(error.code || 500);
 
     if (error instanceof UnauthorizedRequestError) {
       return res.send();
