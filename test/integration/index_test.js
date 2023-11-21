@@ -208,7 +208,7 @@ describe('ExpressOAuthServer', function() {
 
       app.use(oauth.authorize());
 
-      request(app)
+      request(app.listen())
         .post('/')
         .expect({ error: 'invalid_argument', error_description: 'Invalid argument: model does not implement `getClient()`' })
         .end(done);
