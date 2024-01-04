@@ -4,6 +4,7 @@
 
 const ExpressOAuthServer = require('../../');
 const InvalidArgumentError = require('@node-oauth/oauth2-server/lib/errors/invalid-argument-error');
+const UnauthorizedRequestError = require('@node-oauth/oauth2-server/lib/errors/unauthorized-request-error');
 const NodeOAuthServer = require('@node-oauth/oauth2-server');
 const bodyparser = require('body-parser');
 const express = require('express');
@@ -28,7 +29,7 @@ describe('ExpressOAuthServer', function() {
   describe('constructor()', function() {
     it('should throw an error if `model` is missing', function() {
       try {
-        new ExpressOAuthServer({});
+        new ExpressOAuthServer();
 
         should.fail();
       } catch (e) {
@@ -63,7 +64,7 @@ describe('ExpressOAuthServer', function() {
           return token;
         }
       };
-      const oauth = new ExpressOAuthServer({ model: model });
+      const oauth = new ExpressOAuthServer({ model });
 
       app.use(oauth.authenticate());
 
@@ -80,6 +81,25 @@ describe('ExpressOAuthServer', function() {
         .end(done);
     });
 
+    it('should return opaque error if the request lacks proper authentication', function(done) {
+      const model = {
+        getAccessToken: function() {
+          throw new UnauthorizedRequestError();
+        }
+      };
+      const oauth = new ExpressOAuthServer({ model });
+      app.use(oauth.authenticate());
+
+      request(app.listen())
+        .get('/')
+        .set('Authorization', 'Bearer foobar')
+        .expect(401, function (err, res) {
+          (err === null).should.eql(true);
+          (res.body.error === undefined).should.eql(true);
+          done();
+        });
+    });
+
     it('should cache the authorization token', function(done) {
       const tokenExpires = new Date();
       tokenExpires.setDate(tokenExpires.getDate() + 1);
@@ -89,7 +109,7 @@ describe('ExpressOAuthServer', function() {
           return token;
         }
       };
-      const oauth = new ExpressOAuthServer({ model: model });
+      const oauth = new ExpressOAuthServer({ model });
 
       app.use(oauth.authenticate());
       
@@ -127,7 +147,7 @@ describe('ExpressOAuthServer', function() {
           return code;
         }
       };
-      const oauth = new ExpressOAuthServer({ model: model, continueMiddleware: true });
+      const oauth = new ExpressOAuthServer({ model, continueMiddleware: true });
 
       app.use(oauth.authorize());
 
@@ -159,7 +179,7 @@ describe('ExpressOAuthServer', function() {
           return {};
         }
       };
-      const oauth = new ExpressOAuthServer({ model: model });
+      const oauth = new ExpressOAuthServer({ model });
 
       app.use(oauth.authorize());
 
@@ -186,7 +206,7 @@ describe('ExpressOAuthServer', function() {
           return { authorizationCode: 123 };
         }
       };
-      const oauth = new ExpressOAuthServer({ model: model });
+      const oauth = new ExpressOAuthServer({ model });
 
       app.use(oauth.authorize());
 
@@ -198,6 +218,39 @@ describe('ExpressOAuthServer', function() {
         .end(done);
     });
 
+    it('should use error handler', function(done) {
+      const model = {
+        getAccessToken: function() {
+          return { user: {}, accessTokenExpiresAt: new Date() };
+        },
+        getClient: function() {
+          return { grants: ['authorization_code'], redirectUris: ['http://example.com'] };
+        },
+        saveAuthorizationCode: function() {
+          return {};
+        }
+      };
+      const oauth = new ExpressOAuthServer({ model, useErrorHandler: true });
+
+      app.use(oauth.authorize());
+      app.use(function (err, req, res, next) {
+        err.status.should.eql(400);
+        err.name.should.eql('invalid_request');
+        err.message.should.eql('Missing parameter: `response_type`');
+        (typeof next === 'function').should.eql(true);
+        done();
+      });
+
+      request(app.listen())
+        .post('/?state=foobiz')
+        .set('Authorization', 'Bearer foobar')
+        .send({ client_id: 12345 })
+        .expect(500, function(err, res) {
+          (err === null).should.eql(true);
+          (res.body.error === undefined).should.eql(true);
+        });
+    });
+    
     it('should return an error if `model` is empty', function(done) {
       const oauth = new ExpressOAuthServer({ model: {} });
 
@@ -224,7 +277,7 @@ describe('ExpressOAuthServer', function() {
           return token;
         }
       };
-      const oauth = new ExpressOAuthServer({ model: model, continueMiddleware: true });
+      const oauth = new ExpressOAuthServer({ model, continueMiddleware: true });
 
       app.use(oauth.token());
       const spy = sinon.spy(function(req, res, next) {
@@ -257,7 +310,7 @@ describe('ExpressOAuthServer', function() {
         }
       };
       sinon.spy();
-      const oauth = new ExpressOAuthServer({ model: model, continueMiddleware: true });
+      const oauth = new ExpressOAuthServer({ model, continueMiddleware: true });
 
       app.use(oauth.token());
       request(app.listen())
@@ -279,7 +332,7 @@ describe('ExpressOAuthServer', function() {
           return { accessToken: 'foobar', client: {}, refreshToken: 'foobiz', user: {} };
         }
       };
-      const oauth = new ExpressOAuthServer({ model: model });
+      const oauth = new ExpressOAuthServer({ model });
 
       app.use(oauth.token());
 
