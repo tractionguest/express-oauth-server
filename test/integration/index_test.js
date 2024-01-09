@@ -346,7 +346,7 @@ describe('ExpressOAuthServer', function() {
     it('should return an error if `model` is empty', function(done) {
       const oauth = new ExpressOAuthServer({ model: {} });
 
-      app.use(oauth.token());
+      app.use(oauth.token())
 
       request(app.listen())
         .post('/')
