@@ -34,7 +34,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-${{ matrix.node }}
     - run: npm ci
+    - run: npm run lint
     - run: npm run test:coverage
+    - run: npm run build:docs
 
     # with the following action we enforce PRs to have a high coverage
     # and ensure, changes are tested well enough so that coverage won't fail
