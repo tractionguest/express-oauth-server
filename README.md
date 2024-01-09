@@ -48,6 +48,11 @@ app.use(function(req, res) {
 app.listen(3000);
 ```
 
+## More Examples
+
+For more examples, please visit [our dedicated "examples" repo](https://github.com/node-oauth/node-oauth2-server-examples)
+, which also contains express examples.
+
 ## Options
 
 > Note: The following options **extend** the default options from `@node-oauth/oauth2-sever`!
