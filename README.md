@@ -1,6 +1,12 @@
-# Express OAuth Server 
+<div align="center">
+  <h1>Express OAuth Server</h1>
+</div>
 
-Complete, compliant and well tested module for implementing an OAuth2 Server/Provider with [express](https://github.com/expressjs/express) in [node.js](http://nodejs.org/).
+<p align="center">
+Complete, compliant and well tested module for implementing an OAuth2 Server/Provider with <a alt="express" href="https://github.com/expressjs/express">express</a> in <a alt="node.js" href="http://nodejs.org/">Node.js</a>.
+</p>
+
+<div align="center">
 
 [![Tests](https://github.com/node-oauth/express-oauth-server/actions/workflows/tests.yml/badge.svg)](https://github.com/node-oauth/express-oauth-server/actions/workflows/tests.yml)
 [![CodeQL](https://github.com/node-oauth/express-oauth-server/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/node-oauth/express-oauth-server/actions/workflows/github-code-scanning/codeql)
@@ -9,9 +15,25 @@ Complete, compliant and well tested module for implementing an OAuth2 Server/Pro
 [![npm Downloads/Week](https://img.shields.io/npm/dw/@node-oauth/express-oauth-server)](https://www.npmjs.com/package/@node-oauth/oauth2-server)
 ![GitHub](https://img.shields.io/github/license/node-oauth/express-oauth-server)
 
+</div>
 
-This is the express wrapper for [@node-oauth/oauth2-server](https://github.com/node-oauth/node-oauth2-server),
-it's a fork from the former [oauthjs/express-oauth-server](https://github.com/oauthjs/express-oauth-server).
+<div align="center">
+
+[API Docs](https://node-oauth.github.io/express-oauth-server/)
+·
+[NPM Link](https://www.npmjs.com/package/@node-oauth/express-oauth-server)
+·
+[Node OAuth2 Server](https://github.com/node-oauth/node-oauth2-server)
+
+</div>
+
+## About
+
+This package wraps the [@node-oauth/oauth2-server](https://github.com/node-oauth/node-oauth2-server) into an
+express compatible middleware.
+It's a maintained and up-to-date fork from the former
+[oauthjs/express-oauth-server](https://github.com/oauthjs/express-oauth-server).
+
 
 ## Installation
 
@@ -48,11 +70,6 @@ app.use(function(req, res) {
 app.listen(3000);
 ```
 
-## More Examples
-
-For more examples, please visit [our dedicated "examples" repo](https://github.com/node-oauth/node-oauth2-server-examples)
-, which also contains express examples.
-
 ## Options
 
 > Note: The following options **extend** the default options from `@node-oauth/oauth2-sever`!
@@ -83,6 +100,20 @@ const options = {
 
   `authenticate()` does not modify the response and will always call next()
 
+## Migration notes
+
+Beginning with **version 4.0** this package brings some potentially breaking changes:
+
+- dropped old es5 code; moved to native async/await
+- requires node >= 16
+- ships with [@node-oauth/oauth2-server](https://github.com/node-oauth/node-oauth2-server) 5.x
+- no express version pinned but declared as `'*'` peer dependency, so it should not cause conflicts with your express version
+
+## More Examples
+
+For more examples, please visit [our dedicated "examples" repo](https://github.com/node-oauth/node-oauth2-server-examples)
+, which also contains express examples.
+
 ## License
 
-MIT, see 
+MIT, see [license file](./LICENSE).
