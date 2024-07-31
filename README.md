@@ -72,9 +72,9 @@ app.listen(3000);
 
 ## Options
 
-> Note: The following options **extend** the default options from `@node-oauth/oauth2-sever`!
+> Note: The following options **extend** the default options from `@node-oauth/oauth2-server`!
 > You can read more about all possible options in the
-> [@node-oauth/oauth2-sever documentation](https://node-oauthoauth2-server.readthedocs.io/en/master/api/oauth2-server.html)
+> [@node-oauth/oauth2-server documentation](https://node-oauthoauth2-server.readthedocs.io/en/master/api/oauth2-server.html)
  
 ```
 const options = { 
