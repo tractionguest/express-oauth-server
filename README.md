@@ -93,10 +93,8 @@ const options = {
 (_type: boolean default: false_)
 
   The `authorize()` and `token()` middlewares will both render their 
-  result to the response and end the pipeline.
-  next() will only be called if this is set to true.
-
-  **Note:** You cannot modify the response since the headers have already been sent.
+  result to the response and end the pipeline **unless** this is set to true,
+  then only next() will be called.
 
   `authenticate()` does not modify the response and will always call next()
 

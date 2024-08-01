@@ -49,9 +49,7 @@ class ExpressOAuthServer {
    * @param options.useErrorHandler {boolean=} If false, an error response will be rendered by this component.
    *   Set this value to true to allow your own express error handler to handle the error.
    * @param options.continueMiddleware {boolean=} The `authorize()` and `token()` middlewares will both render their
-   *   result to the response and end the pipeline.
-   *   next() will only be called if this is set to true.
-   *   **Note:** You cannot modify the response since the headers have already been sent.
+   *   result to the response and end the pipeline unless this is set to true, then only next() will be called.
    *   `authenticate()` does not modify the response and will always call next()
    */
   constructor(options = {}) {
@@ -121,7 +119,7 @@ class ExpressOAuthServer {
 
       res.locals.oauth = { code };
       if (this.continueMiddleware) {
-        next();
+        return next();
       }
 
       return handleResponse.call(this, req, res, response);
@@ -154,7 +152,7 @@ class ExpressOAuthServer {
 
       res.locals.oauth = { token };
       if (this.continueMiddleware) {
-        next();
+        return next();
       }
 
       return handleResponse.call(this, req, res, response);
