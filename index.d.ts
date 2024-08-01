@@ -10,7 +10,6 @@ import * as OAuth2Server from "@node-oauth/oauth2-server";
 declare namespace ExpressOAuthServer {
   interface Options extends OAuth2Server.ServerOptions {
     useErrorHandler?: boolean | undefined;
-    continueMiddleware?: boolean | undefined;
   }
 }
 
@@ -28,7 +27,9 @@ declare class ExpressOAuthServer {
   ) => Promise<OAuth2Server.Token>;
 
   authorize(
-    options?: OAuth2Server.AuthorizeOptions
+    options?: OAuth2Server.AuthorizeOptions & {
+      continueMiddleware?: boolean | undefined;
+    }
   ): (
     request: express.Request,
     response: express.Response,
@@ -36,7 +37,9 @@ declare class ExpressOAuthServer {
   ) => Promise<OAuth2Server.AuthorizationCode>;
 
   token(
-    options?: OAuth2Server.TokenOptions
+    options?: OAuth2Server.TokenOptions & {
+      continueMiddleware?: boolean | undefined;
+    }
   ): (
     request: express.Request,
     response: express.Response,

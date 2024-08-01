@@ -79,7 +79,6 @@ app.listen(3000);
 ```
 const options = { 
   useErrorHandler: false, 
-  continueMiddleware: false,
 }
 ```
 
@@ -88,6 +87,14 @@ const options = {
 
   If false, an error response will be rendered by this component.
   Set this value to true to allow your own express error handler to handle the error.
+
+## Extra options for token and authorize middlewares
+
+```
+const options = { 
+  continueMiddleware: false, 
+}
+```
 
 - `continueMiddleware`
 (_type: boolean default: false_)

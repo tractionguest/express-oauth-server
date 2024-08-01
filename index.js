@@ -48,9 +48,6 @@ class ExpressOAuthServer {
    * @param options {object=} optional options
    * @param options.useErrorHandler {boolean=} If false, an error response will be rendered by this component.
    *   Set this value to true to allow your own express error handler to handle the error.
-   * @param options.continueMiddleware {boolean=} The `authorize()` and `token()` middlewares will both render their
-   *   result to the response and end the pipeline unless this is set to true, then only next() will be called.
-   *   `authenticate()` does not modify the response and will always call next()
    */
   constructor(options = {}) {
     if (!options.model) {
@@ -59,9 +56,6 @@ class ExpressOAuthServer {
 
     this.useErrorHandler = !!options.useErrorHandler;
     delete options.useErrorHandler;
-
-    this.continueMiddleware = !!options.continueMiddleware;
-    delete options.continueMiddleware;
 
     this.server = new NodeOAuthServer(options);
   }
@@ -99,9 +93,13 @@ class ExpressOAuthServer {
    * Authorization Middleware.
    * Returns a middleware that will authorize a client to request tokens.
    *
-   * @param options {object=} will be passed to the authorize-handler as options, see linked docs
+   * The following describes only options, specific to this module.
+   * For all other options, please read the docs from `@node-oauth/oauth2-server`:
    * @see https://node-oauthoauth2-server.readthedocs.io/en/master/api/oauth2-server.html#authorize-request-response-options
    * @see: https://tools.ietf.org/html/rfc6749#section-3.1
+   * @param options {object=} will be passed to the authorize-handler as options, see linked docs
+   * @param options.continueMiddleware {boolean=} This middleware will render its
+   *   result to the response and end the pipeline unless this is set to true, then only next() will be called.
    * @return {function(req, res, next):Promise.<Object>}
    */
   authorize(options) {
@@ -109,7 +107,10 @@ class ExpressOAuthServer {
       const request = new Request(req);
       const response = new Response(res);
 
-      let code
+      const continueMiddleware = !!options?.continueMiddleware;
+      delete options?.continueMiddleware;
+
+      let code;
 
       try {
         code = await this.server.authorize(request, response, options);
@@ -118,7 +119,7 @@ class ExpressOAuthServer {
       }
 
       res.locals.oauth = { code };
-      if (this.continueMiddleware) {
+      if (continueMiddleware) {
         return next();
       }
 
@@ -131,10 +132,14 @@ class ExpressOAuthServer {
   /**
    * Grant Middleware.
    * Returns middleware that will grant tokens to valid requests.
-   *
-   * @param options {object=} will be passed to the token-handler as options, see linked docs
+   * 
+   * The following describes only options, specific to this module.
+   * For all other options, please read the docs from `@node-oauth/oauth2-server`:
    * @see https://node-oauthoauth2-server.readthedocs.io/en/master/api/oauth2-server.html#token-request-response-options
    * @see: https://tools.ietf.org/html/rfc6749#section-3.2
+   * @param options {object=} will be passed to the token-handler as options, see linked docs
+   * @param options.continueMiddleware {boolean=} This middleware will render its
+   *   result to the response and end the pipeline unless this is set to true, then only next() will be called.
    * @return {function(req, res, next):Promise.<Object>}
    */
   token(options) {
@@ -142,7 +147,10 @@ class ExpressOAuthServer {
       const request = new Request(req);
       const response = new Response(res);
 
-      let token
+      const continueMiddleware = !!options?.continueMiddleware;
+      delete options?.continueMiddleware;
+
+      let token;
 
       try {
         token = await this.server.token(request, response, options);
@@ -151,7 +159,7 @@ class ExpressOAuthServer {
       }
 
       res.locals.oauth = { token };
-      if (this.continueMiddleware) {
+      if (continueMiddleware) {
         return next();
       }
 
